@@ -10,7 +10,7 @@ let bob;
 let sprite;
 
 let BOB;
-class Bob{ //character
+class Character{ //character
     constructor(x,y,target_x,target_y){
         this.x = x
         this.y = y
@@ -33,7 +33,7 @@ class Bob{ //character
     clear(){
         for(i = 0; i < gridSize;i++){
             for(j = 0; j < gridSize;j++){
-                if(!(Grid[i][j] instanceof Bob) && BOB.Path[i][j] == 1){
+                if(!(Grid[i][j] instanceof Character) && BOB.Path[i][j] == 1){
                     fill(CGrid)
                     square(i*scl,j*scl,scl)
                 }
@@ -103,7 +103,7 @@ function setup() {//sets up canvas size and other desired content
     createCanvas(800, 800);
     scl = 800/gridSize;
     generateGrid();
-    BOB = new Bob(2,4,17,18)
+    BOB = new Character(2,4,17,18)
     BOB.render()
 }
 
@@ -145,7 +145,7 @@ function draw(){//draw loop
 
     for(i = 0; i < gridSize;i++){
         for(j = 0; j < gridSize;j++){
-            if(!(Grid[i][j] instanceof Bob) && BOB.Path[i][j] == 1){
+            if(!(Grid[i][j] instanceof Character) && BOB.Path[i][j] == 1){
                 fill(CM1)
                 square(i*scl,j*scl,scl)
             }
