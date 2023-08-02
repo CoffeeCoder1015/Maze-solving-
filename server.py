@@ -5,7 +5,7 @@ app = Flask(__name__)
 files = {
     "index":"app/index.html",
     "main":"app/main.js",
-    "sprite":"app/sprites.png", #define actual assets
+    #"sprite":"app/bob.png", #define actual assets
 }
 
 
