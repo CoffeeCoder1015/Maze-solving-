@@ -6,10 +6,36 @@ let CGrid;
 let CWall;
 let CM1;
 
-let bob;
-let sprite;
+let bob_img;
+let target_img;
 
 let BOB;
+
+class Target{
+    constructor(x,y){
+        this.x = x
+        this.y = y
+
+        Grid[x][y] = this
+    }
+
+    move(x,y){
+        if(Grid[x][y] != 0){
+            return console.error("Invalid move");
+        }
+    }
+
+    render(){
+        image(
+            target_img,
+            this.x*scl,
+            this.y*scl,
+            scl,
+            scl
+        );
+    }
+}
+
 class Character{ //character
     constructor(x,y,target_x,target_y){
         this.x = x
@@ -19,22 +45,44 @@ class Character{ //character
         this.visited = Array(gridSize).fill().map(() => Array(gridSize).fill(0));
         this.Path = Array(gridSize).fill().map(() => Array(gridSize).fill(0));
         Grid[x][y] = this
+        this.render()
+    }
+
+    move(x,y){
+        if(Grid[x][y] == 0){
+            this.clear()
+            //fills in current squ
+            Grid[this.x][this.y] = 0
+            fill(CGrid)
+            square(this.x*scl,this.y*scl,scl)
+            this.x = x;
+            this.y = y;
+            //Spawns in new square
+            Grid[this.x][this.y] = this
+            this.render()
+        }
     }
 
     render(){
         image(
-            bob,
+            bob_img,
             this.x*scl,
             this.y*scl,
             scl,
             scl
         );
     }
+
     clear(){
         for(i = 0; i < gridSize;i++){
             for(j = 0; j < gridSize;j++){
                 if(!(Grid[i][j] instanceof Character) && BOB.Path[i][j] == 1){
-                    fill(CGrid)
+                    if(Grid[i][j] == 0){
+                        fill(CGrid)
+                    }else if(Grid[i][j] == 1){
+                        fill(CWall)
+                    }
+                    
                     square(i*scl,j*scl,scl)
                 }
             }        
@@ -42,9 +90,10 @@ class Character{ //character
         this.visited = Array(gridSize).fill().map(() => Array(gridSize).fill(0));
         this.Path = Array(gridSize).fill().map(() => Array(gridSize).fill(0));
     }
+
     solve_bfs(){
         var Queue = [[this.x,this.y]] //start off with current position
-        while(queueMicrotask.length != 0){
+        while(Queue.length > 0){
             var current = Queue.shift()
             if(current[0] == this.target_x && current[1] == this.target_y){
                 break;
@@ -61,15 +110,15 @@ class Character{ //character
         }
 
         var Current = [this.target_x,this.target_y]
-        console.log(Current[0] != this.x && Current[1] != this.y);
-        while(true){
-            if(Current[0] === this.x && Current[1] === this.y){
-                break
+        if(this.visited[Current[0]][Current[1]] != 0){
+            while(true){
+                if(Current[0] === this.x && Current[1] === this.y){
+                    break
+                }
+                this.Path[Current[0]][Current[1]] = 1
+                Current = this.visited[Current[0]][Current[1]]
             }
-            console.log(Current,this.visited[Current[0]][Current[1]])
-            this.Path[Current[0]][Current[1]] = 1
-            Current = this.visited[Current[0]][Current[1]]
-        }
+        }   
     }
 
     getNeighbors(pos){
@@ -93,7 +142,8 @@ class Character{ //character
 }
 
 function preload() { //load images etc
-    bob = loadImage("bob.png");
+    bob_img = loadImage("bob.png");
+    target_img = loadImage("target.png");
 }
 
 function setup() {//sets up canvas size and other desired content
@@ -104,7 +154,6 @@ function setup() {//sets up canvas size and other desired content
     scl = 800/gridSize;
     generateGrid();
     BOB = new Character(2,4,17,18)
-    BOB.render()
 }
 
 function generateGrid(){
@@ -119,15 +168,20 @@ function generateGrid(){
 
 Wall = 0
 Path = 1
+char = 2
 mode = -1 //no mode set
+
 function draw(){//draw loop
     BOB.render()
 
     var gridX = Math.floor(mouseX/scl)
     var gridY = Math.floor(mouseY/scl)
-    if(mouseIsPressed == true && (gridX <= 20) && (gridY <= 20)){
+    if(mouseIsPressed == true && (0 <= gridX) &&(gridX < 20) &&(0 <= gridY) && (gridY < 20)){
         if(mode == -1){
             mode = Grid[gridX][gridY]
+            if(Grid[gridX][gridY] instanceof Character){
+                mode=char
+            }
         }
         if(Grid[gridX][gridY] == 0 || Grid[gridX][gridY] == 1){
             if(mode == Wall){
@@ -137,8 +191,13 @@ function draw(){//draw loop
                 Grid[gridX][gridY] = 0
                 fill(CGrid)
             }   
+            square(gridX*scl,gridY*scl,scl)
         }
-        square(gridX*scl,gridY*scl,scl)
+        if(mode==char){
+            BOB.move(gridX,gridY);
+            BOB.solve_bfs();
+        }
+        
     }else{
         mode = -1
     }
@@ -147,6 +206,9 @@ function draw(){//draw loop
         for(j = 0; j < gridSize;j++){
             if(!(Grid[i][j] instanceof Character) && BOB.Path[i][j] == 1){
                 fill(CM1)
+                if(Grid[i][j] == 1){
+                    fill(CWall)
+                }
                 square(i*scl,j*scl,scl)
             }
         }        
