@@ -5,6 +5,8 @@ let scl;
 let CGrid;
 let CWall;
 
+let bob;
+let sprite;
 
 class Bob{ //character
     constructor(x,y,target_x,target_y){
@@ -12,13 +14,27 @@ class Bob{ //character
         this.y = y
         this.target_x = target_x
         this.target_y = target_y
+        this.visited = []
+        this.path = []
     }
 
-    
+    render(){
+        image(
+            bob,
+            this.x*scl,
+            this.y*scl,
+            scl,
+            scl
+        );
+    }
+
+    solve_bfs(){
+        
+    }
 }
 
 function preload() { //load images etc
-    /* spriteSheet = loadImage("bob.png"); */
+    bob = loadImage("bob.png");
 }
 
 function setup() {//sets up canvas size and other desired content
@@ -45,8 +61,7 @@ mode = -1 //no mode set
 function draw(){//draw loop
     var gridX = Math.floor(mouseX/scl)
     var gridY = Math.floor(mouseY/scl)
-    console.log(mode)
-    if(mouseIsPressed == true){
+    if(mouseIsPressed == true && (gridX <= 20) && (gridY <= 20)){
         if(mode == -1){
             mode = Grid[gridX][gridY]
         }

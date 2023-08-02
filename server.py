@@ -5,7 +5,7 @@ app = Flask(__name__)
 files = {
     "index":"app/index.html",
     "main":"app/main.js",
-    #"sprite":"app/bob.png", #define actual assets
+    "sprite":"app/bob.png", #define actual assets
 }
 
 
@@ -19,7 +19,7 @@ def index():
 def tile():
     return open(files["main"],"r").read()
 
-@app.route("/sprites.png")
+@app.route("/bob.png")
 def sprite():
     return open(files["sprite"],"rb").read()
 
